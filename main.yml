@@ -22,18 +22,3 @@
         oracle_jar: "ojdbc10.jar"
         postgresql_jar: "postgresql-42.2.19.jar"
         as400_jar: "jt400.jar"
-
-
-- name: Install JBoss EAP latest Patch
-  hosts: "{{ servers | default('master:slaves') }}"
-  serial: "{{ max_servers_run | default('1') }}" # numeros maximo de servidores en paralelo a parchear
-  become: true
-  tasks:
-  roles:
-    - role: jboss_patch_apply
-      vars:
-        repo_url: "http://192.168.102.224/repo/"
-        new_patch_version: "7.1.6"
-        patch_zip_file: "jboss-eap-7.1.6-patch.zip"
-        jboss_home_dir: "/opt/jboss-eap-7.1/"
-        service_name: "jboss-eap"
