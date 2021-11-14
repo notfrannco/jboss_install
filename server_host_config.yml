@@ -1,0 +1,46 @@
+---
+- name: Playbook for Jboss EAP server host config
+  hosts: "{{ servers | default('jb_2') }}" # slave server
+  become: true
+  vars:
+    server_group: "microws-group"
+    server_name: "gw-server-1"
+    profile: "full-ha"
+    socket: "full-sockets"
+    jboss_home: "/opt/jboss-eap-7.1/"
+    jboss_mode: "domain"
+    jboss_host_config: "host-slave.xml"
+    port_offset: "0"
+    xml_namespace: "urn:jboss:domain:5.0"
+  tasks:
+    - name: configure jboss server auto start
+      xml:
+        path: "{{ jboss_home }}/{{ jboss_mode }}/configuration/{{ jboss_host_config }}"
+        xpath: "{{ item.xpath }}"
+        attribute: "{{ item.attribute }}"
+        value: "{{ item.value }}"
+        namespaces:
+          x: "{{ xml_namespace }}"
+      loop:
+        - { xpath: "/x:host/x:servers/x:server[@group='{{ server_group }}']", attribute: 'auto-start',  value: 'true' }
+        - { xpath: "/x:host/x:servers/x:server[@group='{{ server_group }}']", attribute: 'name',  value: '{{ server_name }}' }
+      notify: jboss restart 
+
+    - name: configure jboss server port off-set
+      xml:
+        path: "{{ jboss_home }}/{{ jboss_mode }}/configuration/{{ jboss_host_config }}"
+        xpath: "{{ item.xpath }}"
+        attribute: "{{ item.attribute }}"
+        value: "{{ port_offset }}"
+        namespaces:
+          x: "{{ xml_namespace }}"
+      loop:
+        - { xpath: "/x:host/x:servers/x:server/x:socket-bindings[@socket-binding-group='{{ socket }}']", attribute: 'port-offset' }
+      notify: jboss restart 
+
+
+  handlers:
+    - name: jboss restart
+      service:
+        name: jboss-eap
+        state: restarted

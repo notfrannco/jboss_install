@@ -1,0 +1,42 @@
+---
+# instalacion de paquetes necesarios
+
+- name: Add a System user that runs the JBoss process
+  user:
+    name: "{{ system_user }}"
+    state: present
+    system: yes
+  tags:
+    - add_system_user
+    - pre_requisitos
+
+- name: Check that java is present
+  yum:
+    name: "{{ java_version | default('java-1.8.0-openjdk') }}"
+    state: present
+  tags:
+    - java_install
+    - check_that_java_is_present
+    - pre_requisitos
+
+- name: Copy the JBoss EAP zip file to the remote server
+  get_url:
+    url: "{{ repo_url }}{{ jboss_zip }}"
+    dest: "{{ install_location }}"
+    owner: "{{ system_user }}"
+    group: "{{ system_user }}"
+  tags:
+    - copy_installer_zip
+    - pre_requisitos
+
+- name: extract the zip file
+  unarchive:
+    src: "{{ install_location }}{{ jboss_zip }}"
+    dest: "{{ install_location }}"
+    owner: "{{ system_user }}"
+    group: "{{ system_user }}"
+    remote_src: yes
+    creates: "{{ install_location }}{{ jboss_zip[:-6] }}"
+  tags:
+    - extract_the_zip_file
+    - pre_requisitos

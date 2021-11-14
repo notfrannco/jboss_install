@@ -1,0 +1,47 @@
+---
+- name: Configure a simple repo with apache
+  hosts: "{{ server | default('jb_1') }}"  # servidor a ser utilizado como repo
+  become: true
+  tasks:
+    - name: install apache
+      yum:
+        name: httpd
+        state: present
+      tags:
+        - install_apache
+
+    - name: copy the conf file
+      template:
+        src: templates/repo.conf
+        dest: /etc/httpd/conf.d/repo.conf
+      notify: restart httpd
+      tags:
+        - copy_the_conf_file
+
+    - name: check firewalld is up
+      service:
+        name: firewalld
+        state: started
+      tags:
+        - check_firewalld_is_up
+
+    - name: add http service to the firewalld
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+        immediate: yes
+      tags:
+        - add_http_service_to_the_firewalld
+
+    - name: enable the httpd service
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: restart httpd
+      service:
+        name: httpd
+        state: restarted

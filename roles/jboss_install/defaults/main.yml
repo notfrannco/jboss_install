@@ -1,0 +1,41 @@
+---
+# defaults file for Jboss
+jboss_master: "192.168.102.224"
+jboss_zip: "jboss-eap-7.1.0.zip"
+system_user: "jboss"
+install_location: "/opt/"
+service_name: "jboss-eap"
+jboss_home_dir: "/opt/jboss-eap-7.1/"
+jboss_host_config: "host-slave.xml"
+jboss_mode: "domain"
+jboss_service_script: "jboss-eap-rhel.sh"
+jboss_service_conf: "jboss-eap.conf"
+java_version: "java-1.8.0-openjdk"
+xml_namespace: "urn:jboss:domain:5.0" # mapear esto con la version correspondiente de jboss
+
+# drivers jar
+oracle_jar: "ojdbc10.jar"
+postgresql_jar: "postgresql-42.2.19.jar"
+as400_jar: "jt400.jar"
+mssql_jar: "mssql-jdbc-7.0.0.jre8.jar"
+jboss_firewall:
+  - {port: '9990/tcp', state: 'enabled'}
+  - {port: '9999/tcp', state: 'enabled'}
+  - {port: '8080/tcp', state: 'enabled'}
+  - {port: '8443/tcp', state: 'enabled'}
+  - {port: '8009/tcp', state: 'enabled'} # ajp
+  - {port: '8090/tcp', state: 'enabled'} # modcluster mcmp
+  - {port: '55200/udp', state: 'enabled'} # jgroups
+  - {port: '54200/udp', state: 'enabled'} # jgroups
+  - {port: '45688/udp', state: 'enabled'} # jgroups multicast address
+  - {port: '23364/udp', state: 'enabled'} # mod_cluster
+ 
+jboss_jdbc_drivers:
+  - {name: "{{ oracle_jar }}", location: "modules/com/oracle/main/"}
+  - {name: "{{ as400_jar }}", location: "modules/com/ibm/main/"}
+  - {name: "{{ postgresql_jar }}", location: "modules/org/postgresql/main/"}
+ 
+jboss_jdbc_module:
+  - {file: "oracle_module.xml", location: "modules/com/oracle/main/", name: "module.xml"}
+  - {file: "as400_module.xml", location: "modules/com/ibm/main/", name: "module.xml"}
+  - {file: "postgresql_module.xml", location: "modules/org/postgresql/main/", name: "module.xml"}

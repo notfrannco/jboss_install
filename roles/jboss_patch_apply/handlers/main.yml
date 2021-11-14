@@ -1,0 +1,6 @@
+---
+# handlers file for jboss_patch_apply
+- name: Restart JBoss EAP service
+  service:
+    name: "{{ service_name }}"
+    state: restarted

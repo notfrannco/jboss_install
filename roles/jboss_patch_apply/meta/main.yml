@@ -1,0 +1,24 @@
+galaxy_info:
+  author: Javier Franco
+  description: Instalador de JBoss EAP
+  company: Datasystems
+  license: license (GPL-2.0-or-later, MIT, etc)
+
+  min_ansible_version: 2.9
+
+  
+  platforms:
+  - name: RHEL
+    versions:
+    - 7.x
+    - 8.x
+
+  - name: JBoss EAP
+    versions:
+    - 7.x
+    - 8.x
+
+  galaxy_tags:
+    - web
+    - system
+    - application_server

@@ -1,0 +1,43 @@
+---
+- name: Playbook for Jboss EAP server group config
+  hosts: "{{ servers | default('jb_1') }}"
+  become: true
+  vars:
+    server_group: "default"
+    profile: "full-ha"
+    socket: "full-sockets"
+    jboss_home: "/opt/jboss-eap-7.1/"
+    jboss_mode: "domain"
+    jboss_host_config: "domain.xml"
+    xml_namespace: "urn:jboss:domain:5.0"
+  tasks:
+    - name: configure jboss server group
+      xml:
+        path: "{{ jboss_home }}/{{ jboss_mode }}/configuration/{{ jboss_host_config }}"
+        xpath: "{{ item.xpath }}"
+        attribute: ref
+        value: "{{ item.ref }}"
+        namespaces:
+          x: "{{ xml_namespace }}"
+      loop:
+        - { xpath: "/x:domain/x:server-groups/x:server-group[@name='{{ server_group }}']/x:socket-binding-group", ref: "{{ socket }}" }
+      notify: jboss restart 
+
+    - name: configure jboss server group profile
+      xml:
+        path: "{{ jboss_home }}/{{ jboss_mode }}/configuration/{{ jboss_host_config }}"
+        xpath: "{{ item.xpath }}"
+        attribute: profile 
+        value: "{{ profile }}"
+        namespaces:
+          x: "{{ xml_namespace }}"
+      loop:
+        - { xpath: "/x:domain/x:server-groups/x:server-group[@name='{{ server_group }}']" }
+      notify: jboss restart 
+
+
+  handlers:
+    - name: jboss restart
+      service:
+        name: jboss-eap
+        state: restarted

@@ -1,0 +1,17 @@
+---
+- name: Custom facts for JBoss EAP version checking
+  hosts: "{{ servers | default('all') }}"
+  become: true
+  vars:
+    jboss_version_install: "jboss-eap-7.1"
+  tasks:
+    - name: create the custom facts directory
+      file:
+        path: /etc/ansible/facts.d
+        state: directory
+
+    - name: copy custom facts
+      template:
+        src: templates/jboss_version.fact
+        dest: /etc/ansible/facts.d/jboss_version.fact
+        mode: "0777"

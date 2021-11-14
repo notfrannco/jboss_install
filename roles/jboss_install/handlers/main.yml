@@ -1,0 +1,11 @@
+---
+# handlers file for jboss
+- name: restart jboss
+  service:
+    name: "{{ service_name }}"
+    state: restarted
+
+# https://access.redhat.com/solutions/190643
+- name: reload sysctl
+  shell: sysctl --system
+  ignore_errors: yes 

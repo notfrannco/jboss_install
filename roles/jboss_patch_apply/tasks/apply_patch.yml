@@ -1,0 +1,11 @@
+- name: download the patch file to the server {{ inventory_hostname }}
+  get_url:
+    url: "{{ repo_url }}{{ patch_zip_file }}"
+    dest: "{{ jboss_home_dir }}/bin/"
+
+- name: apply the patch
+  shell: './jboss-cli.sh --command="patch apply {{ patch_zip_file }}"'
+  args:
+    chdir: "{{ jboss_home_dir }}/bin/"
+  ignore_errors: yes
+  notify: Restart JBoss EAP service

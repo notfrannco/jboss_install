@@ -1,0 +1,39 @@
+---
+- name: Install JBoss EAP
+  hosts: "{{ servers | default('slaves') }}"
+  become: true
+  tasks:
+  roles:
+    - role: jboss_install
+      vars:
+        jboss_master: "192.168.102.224"
+        jboss_zip: "jboss-eap-7.1.0.zip"
+        system_user: "jboss"
+        install_location: "/opt/"
+        service_name: "jboss-eap"
+        jboss_home: "/opt/jboss-eap-7.1/"
+        jboss_mode: "domain"
+        jboss_host_config: "host-slave.xml"
+        jboss_service_conf_home: "/opt/jboss-eap-7.1/bin/init.d/"
+        jboss_service_script: "jboss-eap-rhel.sh"
+        jboss_service_conf: "jboss-eap.conf"
+        java_version: "java-1.8.0-openjdk"
+        repo_url: "http://192.168.102.224/repo/"
+        oracle_jar: "ojdbc10.jar"
+        postgresql_jar: "postgresql-42.2.19.jar"
+        as400_jar: "jt400.jar"
+
+
+- name: Install JBoss EAP latest Patch
+  hosts: "{{ servers | default('master:slaves') }}"
+  serial: "{{ max_servers_run | default('1') }}" # numeros maximo de servidores en paralelo a parchear
+  become: true
+  tasks:
+  roles:
+    - role: jboss_patch_apply
+      vars:
+        repo_url: "http://192.168.102.224/repo/"
+        new_patch_version: "7.1.6"
+        patch_zip_file: "jboss-eap-7.1.6-patch.zip"
+        jboss_home_dir: "/opt/jboss-eap-7.1/"
+        service_name: "jboss-eap"

@@ -1,0 +1,12 @@
+[all]
+jb_1 ansible_host=192.168.102.224
+jb_2 ansible_host=192.168.102.137
+jb_3 ansible_host=192.168.102.138
+
+[master]
+jb_1
+
+
+[slaves]
+jb_2
+jb_3

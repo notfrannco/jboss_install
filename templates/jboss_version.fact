@@ -1,0 +1,8 @@
+#!/bin/bash
+
+eap_version=$(cat /opt/{{ jboss_version_install | default('jboss-eap-7.1') }}/version.txt | awk '{print $9}' | sed 's/.GA//')
+
+cat << EOF 
+{ "eap_version": "$eap_version"
+}
+EOF

@@ -1,0 +1,9 @@
+---
+# tasks file for jboss
+- include_tasks: pre_requisitos.yml
+
+- include_tasks: firewall_config.yml
+
+- include_tasks: install.yml
+
+- include_tasks: jdbc_driver_config.yml
