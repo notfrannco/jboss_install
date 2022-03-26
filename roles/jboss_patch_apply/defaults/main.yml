@@ -3,5 +3,5 @@
 new_patch_version: "7.1.0"
 patch_zip_file: "jboss-eap-7.2.8-patch.zip"
 service_name: "jboss-eap"
-jboss_home_dir: "/opt/jboss-eap-7.1/"
+jboss_home: "/opt/jboss-eap-7.1/"
 repo_url: "http://jb_1/repo/"

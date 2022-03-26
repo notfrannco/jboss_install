@@ -1,0 +1,34 @@
+---
+- name: deploy a war to JBoss EAP
+  hosts: "{{ server | default('jb_1') }}"  
+  become: true
+  vars:
+    repo_url: "http://repo.lab/repo/"
+    war_file: "hello-world.war"
+    war_dest: "/opt/"
+    jboss_home: "/opt/jboss-eap-7.4/"
+  tasks:
+    - name: copy the war to the JBoss EAP server
+      get_url:
+        url: "{{ repo_url }}{{ war_file }}"
+        dest: "{{ war_dest }}"
+        mode: '0755'
+
+    - name: deploy the war
+      shell: >
+            ./jboss-cli.sh -c --controller={{ ansible_default_ipv4.address }}:9990 
+            --command="deploy {{ war_dest }}/{{ war_file }} --enabled  --force"
+      args:
+        chdir: "{{ jboss_home }}/bin/"
+      ignore_errors: yes
+      register: result
+      #changed_when: "'Duplicate resource' not in result.stdout"
+      tags:
+        - deploy_the_war
+
+    - name: clean up
+      file:
+        name: "{{ war_dest }}{{ war_file }}"
+        state: absent
+      tags:
+        - clean_up

@@ -2,7 +2,7 @@
 # tasks file for jboss
 - name: Create modules directory structure
   file:
-    path: "{{ jboss_home_dir }}{{ item.location }}"
+    path: "{{ jboss_home }}{{ item.location }}"
     state: directory
     owner: "{{ system_user }}"
     group: "{{ system_user }}"
@@ -27,7 +27,7 @@
 - name: copy the driver jar file
   get_url:
     url: "{{ repo_url }}{{ item.name }}"
-    dest: "{{ jboss_home_dir }}/{{ item.location }}"
+    dest: "{{ jboss_home }}/{{ item.location }}"
     owner: "{{ system_user }}"
     group: "{{ system_user }}"
   loop: "{{ jboss_jdbc_drivers }}"

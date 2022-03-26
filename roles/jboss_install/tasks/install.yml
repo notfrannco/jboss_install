@@ -1,8 +1,17 @@
 ---
 # Configure the systemd service
+- name: Create a default admin user for the web console
+  shell: ./add-user.sh -u admin -p admin
+  args:
+    chdir: "{{ jboss_home }}/bin/"
+  ignore_errors: yes
+  tags:
+    - web_console_user_create
+    - install_yml
+
 - name: Copy the init script to /etc/init.d/
   copy:
-    src: "{{ jboss_home_dir }}/bin/init.d/{{ jboss_service_script }}"
+    src: "{{ jboss_home }}/bin/init.d/{{ jboss_service_script }}"
     dest: /etc/init.d/{{ service_name }}
     mode: 0755
     remote_src: yes
@@ -35,14 +44,13 @@
     attribute: value
     value: "{{ item.value }}"
     namespaces:
-      #x: urn:jboss:domain:5.0 # mapear esto con versiones de jboss
       x: "{{ xml_namespace }}"
       attribute: value
       value: "{{ item.value }}"
   loop:
-    - { xpath: "/x:host/x:interfaces/x:interface[@name='management']/x:inet-address", value: "${jboss.bind.address.management:{{ ansible_facts.default_ipv4.address}} }" }
-    - { xpath: "/x:host/x:interfaces/x:interface[@name='public']/x:inet-address", value: "${jboss.bind.address:{{ ansible_facts.default_ipv4.address }} }" }
-    - { xpath: "/x:host/x:interfaces/x:interface[@name='private']/x:inet-address", value: "${jboss.bind.address:{{ ansible_facts.default_ipv4.address }} }" }
+    - { xpath: "/x:{{ xml_root }}/x:interfaces/x:interface[@name='management']/x:inet-address", value: "${jboss.bind.address.management:{{ ansible_facts.default_ipv4.address}} }" }
+    - { xpath: "/x:{{ xml_root }}/x:interfaces/x:interface[@name='public']/x:inet-address", value: "${jboss.bind.address:{{ ansible_facts.default_ipv4.address }} }" }
+    - { xpath: "/x:{{ xml_root }}/x:interfaces/x:interface[@name='private']/x:inet-address", value: "${jboss.bind.address:{{ ansible_facts.default_ipv4.address }} }" }
   notify: restart jboss
   tags:
     - configure_jboss_interfaces
@@ -55,10 +63,10 @@
     attribute: username
     value: "{{ item.value }}"
     namespaces:
-      #x: urn:jboss:domain:5.0 # mapear esto con versiones de jboss
       x: "{{ xml_namespace }}"
   loop:
-    - { xpath: "/x:host/x:domain-controller/x:remote", value: "slave" }
+    - { xpath: "/x:{{ xml_root }}/x:domain-controller/x:remote", value: "slave" }
+  when: jboss_mode == 'domain'
   notify: restart jboss
   tags:
     - configure_jboss_domain_controller_authentication
@@ -71,10 +79,10 @@
     attribute: host
     value: "{{ item.value }}"
     namespaces:
-      #x: urn:jboss:domain:5.0 # mapear esto con versiones de jboss
       x: "{{ xml_namespace }}"
   loop:
-    - { xpath: "/x:host/x:domain-controller/x:remote/x:discovery-options/x:static-discovery", value: "${jboss.domain.master.address:{{ jboss_master }}}" }
+    - { xpath: "/x:{{ xml_root }}/x:domain-controller/x:remote/x:discovery-options/x:static-discovery", value: "${jboss.domain.master.address:{{ jboss_master }}}" }
+  when: jboss_mode == 'domain'
   notify: restart jboss
   tags:
     - configure_the_slave_to_point_to_the_jboss_master
@@ -87,10 +95,10 @@
     attribute: value
     value: "{{ item.value }}"
     namespaces:
-      #x: urn:jboss:domain:5.0 # mapear esto con versiones de jboss
       x: "{{ xml_namespace }}"
   loop:
-    - { xpath: "/x:host/x:management/x:security-realms/x:security-realm/x:server-identities/x:secret", value: "c2xhdmU=" }
+    - { xpath: "/x:{{ xml_root }}/x:management/x:security-realms/x:security-realm/x:server-identities/x:secret", value: "c2xhdmU=" }
+  when: jboss_mode == 'domain'
   notify: restart jboss
   tags:
     - configure_the_secrets
@@ -102,11 +110,10 @@
     xpath: "{{ item.xpath }}"
     state: absent
     namespaces:
-      #x: urn:jboss:domain:5.0 # mapear esto con versiones de jboss
       x: "{{ xml_namespace }}"
   loop:
-    - { xpath: "/x:host/x:servers/*", value: "${jboss.domain.master.address:{{ jboss_master }}}" }
-  notify: restart jboss
+    - { xpath: "/x:{{ xml_root }}/x:servers/*", value: "${jboss.domain.master.address:{{ jboss_master }}}" }
+  when: jboss_mode == 'domain'
   tags:
     - Remove_default_servers_configs_for_the_xml
     - install_yml

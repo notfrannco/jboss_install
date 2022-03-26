@@ -1,0 +1,36 @@
+---
+- name: build and deploy sample hello-world.war
+  hosts: "{{ server | default('reposerver') }}"  
+  become: true
+  tasks:
+    - name: create the build directory
+      file:
+        path: /opt/hello-world/
+        state: directory
+        mode: '0755'
+      tags:
+        - create_the_build_directory
+
+    - name: clone hello-world proyect
+      git:
+        repo: "https://github.com/notfrannco/hello-world.git"
+        dest: /opt/hello-world/
+        force: yes
+      tags:
+        - git_clone_proyect
+
+    - name: build the war
+      shell: mvn package
+      args:
+        chdir: /opt/hello-world/
+      tags:
+        - build_the_war
+
+
+    - name: copy the war to the repo
+      copy:
+        src: /opt/hello-world/target/hello-world.war
+        dest: /opt/repo/
+        remote_src: yes
+      tags:
+        - copy_the_war_to_the_repo

@@ -10,6 +10,6 @@
         repo_url: "http://192.168.102.224/repo/"
         new_patch_version: "7.1.6"
         patch_zip_file: "jboss-eap-7.1.6-patch.zip"
-        jboss_home_dir: "/opt/jboss-eap-7.1/"
+        jboss_home: "/opt/jboss-eap-7.1/"
         service_name: "jboss-eap"
       when: ansible_local.jboss_version.eap_version  <  new_patch_version

@@ -1,6 +1,6 @@
 ---
 - name: Configure a simple repo with apache
-  hosts: "{{ server | default('jb_1') }}"  # servidor a ser utilizado como repo
+  hosts: "{{ server | default('reposerver') }}"  # servidor a ser utilizado como repo
   become: true
   tasks:
     - name: install apache

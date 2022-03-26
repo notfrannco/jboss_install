@@ -1,4 +1,4 @@
 ---
 # tasks file for jboss_patch_apply
-- include_tasks: apply_patch.yml
+- import_tasks: apply_patch.yml
   when: ansible_local.jboss_version.eap_version  <  new_patch_version
