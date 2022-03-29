@@ -48,9 +48,9 @@
       attribute: value
       value: "{{ item.value }}"
   loop:
-    - { xpath: "/x:{{ xml_root }}/x:interfaces/x:interface[@name='management']/x:inet-address", value: "${jboss.bind.address.management:{{ ansible_facts.default_ipv4.address}} }"}
-    - { xpath: "/x:{{ xml_root }}/x:interfaces/x:interface[@name='public']/x:inet-address", value: "${jboss.bind.address:{{ ansible_facts.default_ipv4.address }} }"}
-    - { xpath: "/x:{{ xml_root }}/x:interfaces/x:interface[@name='private']/x:inet-address", value: "${jboss.bind.address:{{ ansible_facts.default_ipv4.address }} }"}
+    - { xpath: "/x:{{ xml_root }}/x:interfaces/x:interface[@name='management']/x:inet-address", value: "${jboss.bind.address.management:{{ ansible_facts.default_ipv4.address}}}"}
+    - { xpath: "/x:{{ xml_root }}/x:interfaces/x:interface[@name='public']/x:inet-address", value: "${jboss.bind.address:{{ ansible_facts.default_ipv4.address }}}"}
+    - { xpath: "/x:{{ xml_root }}/x:interfaces/x:interface[@name='private']/x:inet-address", value: "${jboss.bind.address:{{ ansible_facts.default_ipv4.address }}}"}
   notify: restart jboss
   tags:
     - configure_jboss_interfaces
